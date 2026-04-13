@@ -1,0 +1,13 @@
+# AI Compass local env (Streamlit + Databricks SDK).
+#
+# Create:  conda env create -f environment.yml
+# Activate: conda activate compass
+# Deps:    python -m pip install -r src/app/requirements.txt
+#
+# If pip errors on cacert.pem, run: python -m pip install --upgrade certifi
+name: compass
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip

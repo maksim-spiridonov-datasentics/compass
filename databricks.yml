@@ -1,0 +1,64 @@
+bundle:
+  name: ai_compass
+  terraform:
+    # this is really crucial to tell asset bundles to use
+    # preinstalled terraform instead of trying to downloading it
+    exec_path: terraform
+
+include:
+  - "resources/*.yml"
+
+
+variables:
+  https_proxy:
+    description: "HTTPS_PROXY cluster environment variable value"
+    default: "app-proxy.az.eb-grp.net:8080"
+  no_proxy:
+    description: "NO_PROXY cluster environment variable value"
+    default: "azuredatabricks.net,vault.azure.net,blob.core.windows.net,dfs.core.windows.net,mysql.database.azure.com,servicebus.windows.net,monitor.azure.com,openai.azure.com,cognitiveservices.azure.com,repo.eb.lan.at"
+  jfrog_artifactory_pypi_reader_user:
+    description: "JFROG_ARTIFACTORY_PYPI_READER_USER cluster environment variable value"
+    default: "{{secrets/ss-global-key-vault/JFROG-ARTIFACTORY-PYPI-READER-USER}}"
+  jfrog_artifactory_pypi_reader_token:
+    description: "JFROG_ARTIFACTORY_PYPI_READER_TOKEN cluster environment variable value"
+    default: "{{secrets/ss-global-key-vault/JFROG-ARTIFACTORY-PYPI-READER-TOKEN}}"
+  endpoint_name:
+    description: "Name of the serving endpoint"
+  uc_model_name:
+    description: "Unity Catalog model name"
+  scale_to_zero:
+    description: "Whether the serving endpoint scales to zero"
+
+
+targets:
+  test_gnai:
+    # used for testing new features in the LAB environment
+    mode: development
+    workspace:
+      host: "https://adb-749763889480721.1.azuredatabricks.net/"
+    variables:
+      # environment: lab
+      endpoint_name: ai_compass_test_1
+      uc_model_name: prod_aut_gnai00_lab_catalog.access_uc0078_ai_factory_db.ai_compass
+      scale_to_zero: True
+  lab_gnai:
+    # used for the stable release in the LAB environment
+    default: true
+    mode: development
+    workspace:
+      host: "https://adb-749763889480721.1.azuredatabricks.net/"
+    variables:
+      # environment: lab
+      endpoint_name: ai_compass_fat_1
+      uc_model_name: prod_aut_gnai00_lab_catalog.access_uc0078_ai_factory_db.ai_compass
+      scale_to_zero: True
+  # prod_aif:
+    # used for the stable release in the PROD environment
+  #   mode: production
+  #   workspace:
+  #     host: "https://adb-2325001904661933.13.azuredatabricks.net/"
+  #   variables:
+  #     # environment: prod
+  #     endpoint_name: ai_compass_prod_1
+  #     uc_model_name: uc.schema.model_name
+  #     scale_to_zero: False

@@ -1,0 +1,38 @@
+resources:
+  jobs:
+    deploy_agent:
+      name: deploy_compass
+
+      tasks:
+        - task_key: deploy
+          job_cluster_key: default
+          notebook_task:
+            notebook_path: ../deploy_notebook.py
+
+      job_clusters:
+        - job_cluster_key: default
+          new_cluster:
+            spark_version: 16.4.x-scala2.13
+            node_type_id: Standard_DS3_v2
+            data_security_mode: SINGLE_USER
+            autoscale:
+              min_workers: 1
+              max_workers: 1
+            spark_env_vars:
+              HTTPS_PROXY: ${var.https_proxy}
+              NO_PROXY: ${var.no_proxy}
+              JFROG_ARTIFACTORY_PYPI_READER_USER: ${var.jfrog_artifactory_pypi_reader_user}
+              JFROG_ARTIFACTORY_PYPI_READER_TOKEN: ${var.jfrog_artifactory_pypi_reader_token}
+            init_scripts:
+              - volumes:
+                  destination: /Volumes/main/default/init_scripts/init_artifactory.sh
+              - volumes:
+                  destination: /Volumes/main/default/init_scripts/install_certificates.sh
+
+      parameters:
+        - name: endpoint_name
+          default: ${var.endpoint_name}
+        - name: uc_model_name
+          default: ${var.uc_model_name}
+        - name: scale_to_zero
+          default: ${var.scale_to_zero}

@@ -7,6 +7,8 @@ from databricks.sdk.service.serving import ChatMessage, ChatMessageRole
 
 import compass_sql as cs
 
+st.set_page_config(page_title="AI Compass", page_icon=":compass:")
+
 NONE_SENTINEL = "__compass_none__"
 
 
@@ -58,6 +60,16 @@ def _build_chat_history():
     return history
 
 
+@st.dialog("About")
+def _about_dialog():
+    st.markdown(
+        "This is AI Compass - an AI Ideation coach.\n\n"
+        "Release note: this application is now in the test phase.\n\n"
+        "If you have any problems or suggestions - please fill this form "
+        "<link to form tbd>"
+    )
+
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "active_pdf_text" not in st.session_state:
@@ -87,6 +99,8 @@ with header_left:
     st.caption(f"Signed in as {USER_EMAIL}")
 with header_right:
     st.caption(f"Profile: {USER_EMAIL}")
+    if st.button("About", use_container_width=True):
+        _about_dialog()
     if st.session_state.is_logged_out:
         if st.button("Login", use_container_width=True):
             st.session_state.is_logged_out = False
@@ -112,6 +126,9 @@ if cs.persist_configured():
 st.markdown(
     """
 <style>
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
     [data-testid="stFileUploader"] small {
         display: none;
     }

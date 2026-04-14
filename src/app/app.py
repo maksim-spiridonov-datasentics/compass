@@ -35,11 +35,15 @@ def _get_workspace():
 def _resolve_user_email() -> str:
     headers = st.context.headers
     email = (
-        headers.get("X-Forwarded-Email") or headers.get("x-forwarded-email") or ""
+        headers.get("X-Forwarded-Email")
+        or headers.get("x-forwarded-email")
+        or headers.get("X-Forwarded-Preferred-Username")
+        or headers.get("x-forwarded-preferred-username")
+        or headers.get("X-Forwarded-User")
+        or headers.get("x-forwarded-user")
+        or ""
     ).strip()
-    if email:
-        return email
-    return os.getenv("COMPASS_DEV_USER_EMAIL", "").strip()
+    return email.lower()
 
 
 def _build_chat_history():
@@ -68,8 +72,8 @@ if "current_conversation_id" not in st.session_state:
 USER_EMAIL = _resolve_user_email()
 if not USER_EMAIL:
     st.error(
-        "Could not read your email from Databricks Apps SSO headers. "
-        "Open this app from Databricks Apps, or set COMPASS_DEV_USER_EMAIL for local dev."
+        "Could not read your identity from Databricks Apps SSO headers. "
+        "Open this app from Databricks Apps and verify app authentication is enabled."
     )
     st.stop()
 

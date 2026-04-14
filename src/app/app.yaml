@@ -2,3 +2,11 @@ command:
   - streamlit
   - run
   - app.py
+
+env:
+  - name: COMPASS_SQL_WAREHOUSE_ID
+    valueFrom: sql-warehouse
+  - name: COMPASS_UC_CATALOG
+    value: maksim_spiridonov
+  - name: SERVING_ENDPOINT_NAME
+    valueFrom: serving-endpoint

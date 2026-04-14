@@ -68,6 +68,8 @@ if "show_pdf_prompt" not in st.session_state:
     st.session_state.show_pdf_prompt = False
 if "current_conversation_id" not in st.session_state:
     st.session_state.current_conversation_id = None
+if "is_logged_out" not in st.session_state:
+    st.session_state.is_logged_out = False
 
 USER_EMAIL = _resolve_user_email()
 if not USER_EMAIL:
@@ -80,7 +82,26 @@ if not USER_EMAIL:
 w = _get_workspace()
 
 st.title("AI Compass")
-st.caption(f"Signed in as {USER_EMAIL}")
+header_left, header_right = st.columns([8, 2])
+with header_left:
+    st.caption(f"Signed in as {USER_EMAIL}")
+with header_right:
+    st.caption(f"Profile: {USER_EMAIL}")
+    if st.session_state.is_logged_out:
+        if st.button("Login", use_container_width=True):
+            st.session_state.is_logged_out = False
+            st.rerun()
+    else:
+        if st.button("Logout", use_container_width=True):
+            st.session_state.is_logged_out = True
+            st.session_state.messages = []
+            st.session_state.current_conversation_id = None
+            st.session_state.active_pdf_text = ""
+            st.rerun()
+
+if st.session_state.is_logged_out:
+    st.info("You are logged out from this app session. Click Login to continue.")
+    st.stop()
 
 st.markdown(
     """
@@ -129,12 +150,13 @@ with st.sidebar:
         if cid_cur and cid_cur in ids:
             idx = ids.index(cid_cur) + 1
 
-        st.selectbox(
+        st.radio(
             "Past chats",
             opts,
             index=idx,
             format_func=_fmt,
             key="compass_pick",
+            label_visibility="visible",
         )
 
         if "compass_prev_pick" not in st.session_state:

@@ -34,13 +34,6 @@ CREATE TABLE IF NOT EXISTS messages (
   created_at TIMESTAMP NOT NULL
 ) USING DELTA;
 
-CREATE TABLE IF NOT EXISTS conversations (
-  conversation_id STRING NOT NULL,
-  user_email STRING NOT NULL,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
-) USING DELTA;
-
 CREATE TABLE IF NOT EXISTS users (
   user_email STRING NOT NULL,
   created_at TIMESTAMP NOT NULL,

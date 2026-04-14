@@ -127,6 +127,35 @@ def create_conversation(
     )
 
 
+def upsert_user(w: WorkspaceClient, user_email: str) -> None:
+    ts = _now_sql()
+    run_statement(
+        w,
+        """
+        UPDATE users
+        SET updated_at = :updated_at
+        WHERE user_email = :user_email
+        """,
+        parameters=_params(updated_at=ts, user_email=user_email),
+    )
+    run_statement(
+        w,
+        """
+        INSERT INTO users (user_email, created_at, updated_at)
+        SELECT :user_email_new, :created_at, :updated_at_new
+        WHERE NOT EXISTS (
+          SELECT 1 FROM users WHERE user_email = :user_email_check
+        )
+        """,
+        parameters=_params(
+            user_email_new=user_email,
+            created_at=ts,
+            updated_at_new=ts,
+            user_email_check=user_email,
+        ),
+    )
+
+
 def touch_conversation(w: WorkspaceClient, conversation_id: str, user_email: str) -> None:
     run_statement(
         w,

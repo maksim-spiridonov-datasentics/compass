@@ -103,6 +103,12 @@ if st.session_state.is_logged_out:
     st.info("You are logged out from this app session. Click Login to continue.")
     st.stop()
 
+if cs.persist_configured():
+    try:
+        cs.upsert_user(w, USER_EMAIL)
+    except Exception as err:
+        st.warning(f"Could not sync user profile: {err}")
+
 st.markdown(
     """
 <style>
